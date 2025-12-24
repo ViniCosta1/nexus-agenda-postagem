@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+/* Custom scrollbar for light theme */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #F3EFFC;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(97, 23, 244, 0.4);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(97, 23, 244, 0.6);
+}
+
+/* Animation for modal */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+/* Smooth transitions */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(97, 23, 244, 0.4) #F3EFFC;
+}
+
+/* Selection color */
+::selection {
+  background: rgba(97, 23, 244, 0.2);
+  color: #1a1a2e;
+}
+
+/* Focus visible for accessibility */
+:focus-visible {
+  outline: 2px solid #6117F4;
+  outline-offset: 2px;
+}
+
+/* Body defaults */
+body {
+  background-color: #F8F7FC;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
