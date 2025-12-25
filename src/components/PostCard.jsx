@@ -1,18 +1,12 @@
 import React from 'react';
-import { Image, Video, CircleDot, LayoutGrid, Linkedin, Youtube, Instagram } from 'lucide-react';
+import { Image, Video, CircleDot, LayoutGrid } from 'lucide-react';
+import { getOwnersByIds } from '../config/owners';
 
 const contentTypeIcons = {
   'Post (Imagem)': Image,
   'Reel (Vídeo)': Video,
   'Story': CircleDot,
   'Carrossel': LayoutGrid,
-};
-
-const channelColors = {
-  'LinkedIn': '#0A66C2',
-  'YouTube': '#FF0000',
-  'Instagram': '#E4405F',
-  'TikTok': '#000000',
 };
 
 const statusColors = {
@@ -47,6 +41,26 @@ function PostCard({ post, onClick }) {
       <div className="flex items-center gap-1 mt-1">
         <Icon className="w-3 h-3 text-[#6117F4]/60" />
         <span className="text-[8px] text-[#6B7280] uppercase">{post.channel}</span>
+        {/* Mini avatares dos responsáveis */}
+        {post.owners && post.owners.length > 0 && (
+          <div className="flex -space-x-1 ml-auto">
+            {getOwnersByIds(post.owners).slice(0, 2).map((owner) => (
+              <div
+                key={owner.id}
+                className="w-3.5 h-3.5 rounded-full flex items-center justify-center text-white text-[6px] font-bold border border-white"
+                style={{ backgroundColor: owner.color }}
+                title={owner.name}
+              >
+                {owner.initials.charAt(0)}
+              </div>
+            ))}
+            {post.owners.length > 2 && (
+              <div className="w-3.5 h-3.5 rounded-full flex items-center justify-center text-[6px] font-medium bg-gray-200 text-gray-600 border border-white">
+                +{post.owners.length - 2}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

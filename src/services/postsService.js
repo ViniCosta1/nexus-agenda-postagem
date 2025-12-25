@@ -54,6 +54,7 @@ export const createPost = async (postData) => {
       status: postData.status,
       date: postData.date,
       description: postData.description || '',
+      owners: postData.owners || [],
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now()
     };
@@ -87,6 +88,7 @@ export const updatePost = async (postId, postData) => {
       status: postData.status,
       date: postData.date,
       description: postData.description || '',
+      owners: postData.owners || [],
       updatedAt: Timestamp.now()
     };
     
