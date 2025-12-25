@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Navbar, Calendar, Analytics, PostModal, Login } from './components';
+import { Navbar, Calendar, Analytics, PostModal, Login, DayDetailModal } from './components';
 import { fetchPosts, createPost, updatePost, deletePost } from './services/postsService';
 import { onAuthChange, logout } from './services/authService';
 
@@ -9,10 +9,12 @@ function App() {
   const [activeTab, setActiveTab] = useState('calendario');
   const [posts, setPosts] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDayDetailOpen, setIsDayDetailOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [editingPost, setEditingPost] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [ownerFilter, setOwnerFilter] = useState([]);
 
   // Observar estado de autenticação
   useEffect(() => {
@@ -60,7 +62,11 @@ function App() {
   const handleDayClick = useCallback((date) => {
     setSelectedDate(date);
     setEditingPost(null);
-    setIsModalOpen(true);
+    setIsDayDetailOpen(true);
+  }, []);
+
+  const handleCloseDayDetail = useCallback(() => {
+    setIsDayDetailOpen(false);
   }, []);
 
   const handleCreatePost = useCallback(() => {
@@ -69,7 +75,15 @@ function App() {
     setIsModalOpen(true);
   }, []);
 
+  const handleCreatePostFromDay = useCallback(() => {
+    // Fecha o modal de detalhe do dia e abre o modal de criação
+    setIsDayDetailOpen(false);
+    setEditingPost(null);
+    setIsModalOpen(true);
+  }, []);
+
   const handlePostClick = useCallback((post) => {
+    setIsDayDetailOpen(false);
     setEditingPost(post);
     setSelectedDate(null);
     setIsModalOpen(true);
@@ -146,6 +160,27 @@ function App() {
   // Nome fixo do usuário
   const userName = 'Grupo Nexus';
 
+  // Filtrar posts por responsável (múltiplos)
+  const filteredPosts = ownerFilter.length > 0
+    ? posts.filter((post) => 
+        post.owners?.some(ownerId => ownerFilter.includes(ownerId))
+      )
+    : posts;
+
+  // Filtrar posts do dia selecionado (já com filtro de responsável aplicado)
+  const getPostsForSelectedDate = () => {
+    if (!selectedDate) return [];
+    return filteredPosts.filter((post) => {
+      const [day, month, year] = post.date.split('/');
+      const postDate = new Date(year, month - 1, day);
+      return (
+        postDate.getDate() === selectedDate.getDate() &&
+        postDate.getMonth() === selectedDate.getMonth() &&
+        postDate.getFullYear() === selectedDate.getFullYear()
+      );
+    });
+  };
+
   return (
     <div className="min-h-screen bg-[#F8F7FC] flex flex-col">
       {/* Navbar */}
@@ -157,19 +192,31 @@ function App() {
       />
 
       {/* Main Content */}
-      <main className="flex-1 pt-20">
+      <main className="flex-1 pt-16 md:pt-20">
         {activeTab === 'calendario' ? (
           <Calendar
-            posts={posts}
+            posts={filteredPosts}
             onDayClick={handleDayClick}
             onPostClick={handlePostClick}
             onCreatePost={handleCreatePost}
             isLoading={isLoading}
+            ownerFilter={ownerFilter}
+            onOwnerFilterChange={setOwnerFilter}
           />
         ) : (
           <Analytics />
         )}
       </main>
+
+      {/* Day Detail Modal */}
+      <DayDetailModal
+        isOpen={isDayDetailOpen}
+        onClose={handleCloseDayDetail}
+        selectedDate={selectedDate}
+        posts={getPostsForSelectedDate()}
+        onPostClick={handlePostClick}
+        onCreatePost={handleCreatePostFromDay}
+      />
 
       {/* Post Modal */}
       <PostModal

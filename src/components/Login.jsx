@@ -46,41 +46,41 @@ function Login({ onLoginSuccess }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F7FC] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-[#F8F7FC] flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
         {/* Logo */}
-        <div className="flex justify-center mb-8">
+        <div className="flex justify-center mb-6 md:mb-8">
           <img 
             src="/LOGO SYSTEMS ROXO.png" 
             alt="Logo" 
-            className="h-16 w-auto"
+            className="h-12 md:h-16 w-auto"
           />
         </div>
 
         {/* Card de Login */}
-        <div className="bg-white rounded-2xl shadow-lg border border-[#E8E0F5] p-8">
-          <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-[#1a1a2e] mb-2">
+        <div className="bg-white rounded-2xl shadow-lg border border-[#E8E0F5] p-6 md:p-8">
+          <div className="text-center mb-6 md:mb-8">
+            <h1 className="text-xl md:text-2xl font-bold text-[#1a1a2e] mb-2">
               Bem-vindo de volta
             </h1>
-            <p className="text-[#6B7280] text-sm">
+            <p className="text-[#6B7280] text-xs md:text-sm">
               Acesse sua conta para continuar
             </p>
           </div>
 
           {/* Erro */}
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3">
+            <div className="mb-5 md:mb-6 p-3 md:p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3">
               <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-              <p className="text-red-600 text-sm">{error}</p>
+              <p className="text-red-600 text-xs md:text-sm">{error}</p>
             </div>
           )}
 
           {/* Formulário */}
           <form onSubmit={handleSubmit}>
             {/* Email */}
-            <div className="mb-5">
-              <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+            <div className="mb-4 md:mb-5">
+              <label className="flex items-center gap-2 text-xs md:text-sm font-medium text-gray-700 mb-1.5 md:mb-2">
                 <Mail className="w-4 h-4 text-[#6117F4]" />
                 Email
               </label>
@@ -89,14 +89,14 @@ function Login({ onLoginSuccess }) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="seu@email.com"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6117F4]/30 focus:border-[#6117F4] transition-all text-gray-800 placeholder:text-gray-400"
+                className="w-full px-3 md:px-4 py-2.5 md:py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6117F4]/30 focus:border-[#6117F4] transition-all text-gray-800 placeholder:text-gray-400 text-sm md:text-base"
                 disabled={isLoading}
               />
             </div>
 
             {/* Senha */}
-            <div className="mb-6">
-              <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+            <div className="mb-5 md:mb-6">
+              <label className="flex items-center gap-2 text-xs md:text-sm font-medium text-gray-700 mb-1.5 md:mb-2">
                 <Lock className="w-4 h-4 text-[#6117F4]" />
                 Senha
               </label>
@@ -105,7 +105,7 @@ function Login({ onLoginSuccess }) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6117F4]/30 focus:border-[#6117F4] transition-all text-gray-800 placeholder:text-gray-400"
+                className="w-full px-3 md:px-4 py-2.5 md:py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6117F4]/30 focus:border-[#6117F4] transition-all text-gray-800 placeholder:text-gray-400 text-sm md:text-base"
                 disabled={isLoading}
               />
             </div>
@@ -114,7 +114,7 @@ function Login({ onLoginSuccess }) {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-[#6117F4] text-white font-medium rounded-xl hover:bg-[#4903B4] transition-colors shadow-lg shadow-[#6117F4]/30 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-2 px-6 py-2.5 md:py-3 bg-[#6117F4] text-white font-medium rounded-xl hover:bg-[#4903B4] transition-colors shadow-lg shadow-[#6117F4]/30 disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base"
             >
               {isLoading ? (
                 <>
@@ -129,7 +129,7 @@ function Login({ onLoginSuccess }) {
         </div>
 
         {/* Rodapé */}
-        <p className="text-center text-[#6B7280] text-sm mt-6">
+        <p className="text-center text-[#6B7280] text-xs md:text-sm mt-4 md:mt-6">
           © {new Date().getFullYear()} Nexus Systems. Todos os direitos reservados.
         </p>
       </div>
