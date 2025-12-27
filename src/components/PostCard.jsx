@@ -1,6 +1,6 @@
 import React from 'react';
 import { Image, Video, CircleDot, LayoutGrid } from 'lucide-react';
-import { getOwnersByIds } from '../config/owners';
+import { getOwnersByIds, getAccountById, getResponsibleById } from '../config/owners';
 
 const contentTypeIcons = {
   'Post (Imagem)': Image,
@@ -20,6 +20,26 @@ const statusColors = {
 function PostCard({ post, onClick }) {
   const Icon = contentTypeIcons[post.contentType] || Image;
   const statusColor = statusColors[post.status] || '#9CA3AF';
+
+  // Suporte para formato novo (account + responsibles) e antigo (owners)
+  const displayItems = [];
+  
+  if (post.account) {
+    const account = getAccountById(post.account);
+    if (account) displayItems.push(account);
+  }
+  
+  if (post.responsibles && post.responsibles.length > 0) {
+    post.responsibles.forEach(id => {
+      const responsible = getResponsibleById(id);
+      if (responsible) displayItems.push(responsible);
+    });
+  }
+  
+  // Fallback para formato antigo
+  if (displayItems.length === 0 && post.owners && post.owners.length > 0) {
+    displayItems.push(...getOwnersByIds(post.owners));
+  }
 
   return (
     <div
@@ -41,22 +61,22 @@ function PostCard({ post, onClick }) {
       <div className="flex items-center gap-1 mt-1">
         <Icon className="w-3 h-3 text-[#6117F4]/60" />
         <span className="text-[8px] text-[#6B7280] uppercase">{post.channel}</span>
-        {/* Mini avatares dos responsáveis */}
-        {post.owners && post.owners.length > 0 && (
+        {/* Mini avatares da conta e responsáveis */}
+        {displayItems.length > 0 && (
           <div className="flex -space-x-1 ml-auto">
-            {getOwnersByIds(post.owners).slice(0, 2).map((owner) => (
+            {displayItems.slice(0, 2).map((item) => (
               <div
-                key={owner.id}
+                key={item.id}
                 className="w-3.5 h-3.5 rounded-full flex items-center justify-center text-white text-[6px] font-bold border border-white"
-                style={{ backgroundColor: owner.color }}
-                title={owner.name}
+                style={{ backgroundColor: item.color }}
+                title={item.name}
               >
-                {owner.initials.charAt(0)}
+                {item.initials.charAt(0)}
               </div>
             ))}
-            {post.owners.length > 2 && (
+            {displayItems.length > 2 && (
               <div className="w-3.5 h-3.5 rounded-full flex items-center justify-center text-[6px] font-medium bg-gray-200 text-gray-600 border border-white">
-                +{post.owners.length - 2}
+                +{displayItems.length - 2}
               </div>
             )}
           </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, Target, LayoutGrid, Link2, Calendar as CalendarIcon, Edit3, Trash2, Loader2, Users, Check } from 'lucide-react';
-import { OWNERS } from '../config/owners';
+import { X, Target, LayoutGrid, Link2, Calendar as CalendarIcon, Edit3, Trash2, Loader2, Users, Check, ChevronDown, Building2 } from 'lucide-react';
+import { ACCOUNTS, RESPONSIBLES } from '../config/owners';
 
 const contentTypes = ['Post (Imagem)', 'Reel (Vídeo)', 'Story', 'Carrossel'];
 const channels = ['Instagram', 'LinkedIn', 'YouTube', 'TikTok'];
@@ -12,10 +12,14 @@ function PostModal({ isOpen, onClose, onSave, onDelete, selectedDate, editingPos
     contentType: 'Post (Imagem)',
     channel: 'Instagram',
     status: 'Planejado',
-    date: '',
+    date: '', 
     description: '',
-    owners: [],
+    account: '',
+    responsibles: [],
   });
+
+  const [showAccountDropdown, setShowAccountDropdown] = useState(false);
+  const [showResponsiblesDropdown, setShowResponsiblesDropdown] = useState(false);
 
   useEffect(() => {
     if (editingPost) {
@@ -26,7 +30,8 @@ function PostModal({ isOpen, onClose, onSave, onDelete, selectedDate, editingPos
         status: editingPost.status || 'Planejado',
         date: editingPost.date || '',
         description: editingPost.description || '',
-        owners: editingPost.owners || [],
+        account: editingPost.account || '',
+        responsibles: editingPost.responsibles || [],
       });
     } else if (selectedDate) {
       const day = selectedDate.getDate().toString().padStart(2, '0');
@@ -40,22 +45,57 @@ function PostModal({ isOpen, onClose, onSave, onDelete, selectedDate, editingPos
         status: 'Planejado',
         date: `${day}/${month}/${year}`,
         description: '',
-        owners: [],
+        account: '',
+        responsibles: [],
       }));
     }
   }, [selectedDate, editingPost]);
+
+  // Fechar dropdowns ao abrir o modal
+  useEffect(() => {
+    if (isOpen) {
+      setShowAccountDropdown(false);
+      setShowResponsiblesDropdown(false);
+    }
+  }, [isOpen]);
 
   const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const toggleOwner = (ownerId) => {
+  const toggleResponsible = (responsibleId) => {
     setFormData((prev) => ({
       ...prev,
-      owners: prev.owners.includes(ownerId)
-        ? prev.owners.filter(id => id !== ownerId)
-        : [...prev.owners, ownerId]
+      responsibles: prev.responsibles.includes(responsibleId)
+        ? prev.responsibles.filter(id => id !== responsibleId)
+        : [...prev.responsibles, responsibleId]
     }));
+  };
+
+  const selectAccount = (accountId) => {
+    setFormData((prev) => ({
+      ...prev,
+      account: accountId
+    }));
+    setShowAccountDropdown(false);
+  };
+
+  const toggleAccountDropdown = () => {
+    setShowAccountDropdown(!showAccountDropdown);
+    setShowResponsiblesDropdown(false);
+  };
+
+  const toggleResponsiblesDropdown = () => {
+    setShowResponsiblesDropdown(!showResponsiblesDropdown);
+    setShowAccountDropdown(false);
+  };
+
+  const getSelectedAccount = () => {
+    return ACCOUNTS.find(acc => acc.id === formData.account);
+  };
+
+  const getSelectedResponsibles = () => {
+    return RESPONSIBLES.filter(resp => formData.responsibles.includes(resp.id));
   };
 
   const handleSubmit = (e) => {
@@ -76,7 +116,7 @@ function PostModal({ isOpen, onClose, onSave, onDelete, selectedDate, editingPos
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       {/* Backdrop with blur */}
       <div
         className="absolute inset-0 bg-[#04010A]/80 backdrop-blur-md"
@@ -84,9 +124,9 @@ function PostModal({ isOpen, onClose, onSave, onDelete, selectedDate, editingPos
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-t-2xl md:rounded-2xl shadow-2xl w-full max-w-lg mx-0 md:mx-4 overflow-hidden animate-fadeIn max-h-[90vh] md:max-h-none overflow-y-auto fixed bottom-0 md:relative md:bottom-auto">
-        {/* Header */}
-        <div className="px-5 md:px-8 pt-6 md:pt-8 pb-3 md:pb-4 sticky top-0 bg-white z-10">
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-fadeIn flex flex-col max-h-[95vh]">
+        {/* Header - Fixo */}
+        <div className="px-5 md:px-8 pt-6 md:pt-8 pb-3 md:pb-4 bg-white border-b border-gray-100 flex-shrink-0">
           <div className="flex items-start justify-between">
             <div>
               <h2 className="text-xl md:text-2xl font-bold text-[#04010A]">
@@ -105,8 +145,10 @@ function PostModal({ isOpen, onClose, onSave, onDelete, selectedDate, editingPos
           </div>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="px-5 md:px-8 pb-6 md:pb-8">
+        {/* Form com rolagem */}
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+          {/* Conteúdo com scroll */}
+          <div className="px-5 md:px-8 py-4 md:py-6 overflow-y-auto flex-1">
           {/* Theme */}
           <div className="mb-4 md:mb-5">
             <label className="flex items-center gap-2 text-xs md:text-sm font-medium text-gray-700 mb-1.5 md:mb-2">
@@ -217,43 +259,124 @@ function PostModal({ isOpen, onClose, onSave, onDelete, selectedDate, editingPos
             </div>
           </div>
 
-          {/* Owners/Responsáveis */}
+          {/* Conta (Dropdown) */}
+          <div className="mb-4 md:mb-5">
+            <label className="flex items-center gap-2 text-xs md:text-sm font-medium text-gray-700 mb-1.5 md:mb-2">
+              <Building2 className="w-4 h-4 text-[#6117F4]" />
+              Conta
+            </label>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={toggleAccountDropdown}
+                className="w-full px-3 md:px-4 py-2.5 md:py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6117F4]/30 focus:border-[#6117F4] transition-all text-gray-800 bg-white cursor-pointer text-sm md:text-base flex items-center justify-between"
+              >
+                {getSelectedAccount() ? (
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-bold"
+                      style={{ backgroundColor: getSelectedAccount().color }}
+                    >
+                      {getSelectedAccount().initials}
+                    </div>
+                    <span>{getSelectedAccount().name}</span>
+                  </div>
+                ) : (
+                  <span className="text-gray-400">Selecione uma conta</span>
+                )}
+                <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showAccountDropdown ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {showAccountDropdown && (
+                <div className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                  {ACCOUNTS.map((account) => (
+                    <button
+                      key={account.id}
+                      type="button"
+                      onClick={() => selectAccount(account.id)}
+                      className={`w-full px-3 md:px-4 py-2.5 text-left hover:bg-[#F3EFFC] transition-colors flex items-center gap-2 ${
+                        formData.account === account.id ? 'bg-[#F3EFFC]' : ''
+                      }`}
+                    >
+                      <div
+                        className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-bold"
+                        style={{ backgroundColor: account.color }}
+                      >
+                        {account.initials}
+                      </div>
+                      <span className="text-sm md:text-base">{account.name}</span>
+                      {formData.account === account.id && (
+                        <Check className="w-4 h-4 text-[#6117F4] ml-auto" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Responsáveis (Dropdown com seleção múltipla) */}
           <div className="mb-4 md:mb-5">
             <label className="flex items-center gap-2 text-xs md:text-sm font-medium text-gray-700 mb-1.5 md:mb-2">
               <Users className="w-4 h-4 text-[#6117F4]" />
               Responsáveis
             </label>
-            <div className="flex flex-wrap gap-2">
-              {OWNERS.map((owner) => {
-                const isSelected = formData.owners.includes(owner.id);
-                return (
-                  <button
-                    key={owner.id}
-                    type="button"
-                    onClick={() => toggleOwner(owner.id)}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-lg border-2 transition-all text-sm ${
-                      isSelected
-                        ? 'border-[#6117F4] bg-[#F3EFFC]'
-                        : 'border-gray-200 hover:border-[#C4B5F0] bg-white'
-                    }`}
-                  >
-                    <div
-                      className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-bold"
-                      style={{ backgroundColor: owner.color }}
-                    >
-                      {owner.initials}
-                    </div>
-                    <span className={isSelected ? 'text-[#6117F4] font-medium' : 'text-gray-600'}>
-                      {owner.name}
-                    </span>
-                    {isSelected && (
-                      <Check className="w-4 h-4 text-[#6117F4]" />
-                    )}
-                  </button>
-                );
-              })}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={toggleResponsiblesDropdown}
+                className="w-full px-3 md:px-4 py-2.5 md:py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6117F4]/30 focus:border-[#6117F4] transition-all text-gray-800 bg-white cursor-pointer text-sm md:text-base flex items-center justify-between"
+              >
+                {getSelectedResponsibles().length > 0 ? (
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {getSelectedResponsibles().map((resp) => (
+                      <div key={resp.id} className="flex items-center gap-1 bg-[#F3EFFC] px-2 py-1 rounded-lg">
+                        <div
+                          className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[9px] font-bold"
+                          style={{ backgroundColor: resp.color }}
+                        >
+                          {resp.initials}
+                        </div>
+                        <span className="text-xs">{resp.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <span className="text-gray-400">Selecione os responsáveis</span>
+                )}
+                <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showResponsiblesDropdown ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {showResponsiblesDropdown && (
+                <div className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                  {RESPONSIBLES.map((responsible) => {
+                    const isSelected = formData.responsibles.includes(responsible.id);
+                    return (
+                      <button
+                        key={responsible.id}
+                        type="button"
+                        onClick={() => toggleResponsible(responsible.id)}
+                        className={`w-full px-3 md:px-4 py-2.5 text-left hover:bg-[#F3EFFC] transition-colors flex items-center gap-2 ${
+                          isSelected ? 'bg-[#F3EFFC]' : ''
+                        }`}
+                      >
+                        <div
+                          className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-bold"
+                          style={{ backgroundColor: responsible.color }}
+                        >
+                          {responsible.initials}
+                        </div>
+                        <span className="text-sm md:text-base">{responsible.name}</span>
+                        {isSelected && (
+                          <Check className="w-4 h-4 text-[#6117F4] ml-auto" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
-            {formData.owners.length === 0 && (
+            {formData.responsibles.length === 0 && (
               <p className="text-xs text-gray-400 mt-1.5">Selecione um ou mais responsáveis</p>
             )}
           </div>
@@ -272,9 +395,11 @@ function PostModal({ isOpen, onClose, onSave, onDelete, selectedDate, editingPos
               className="w-full px-3 md:px-4 py-2.5 md:py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6117F4]/30 focus:border-[#6117F4] transition-all text-gray-800 placeholder:text-gray-400 resize-none text-sm md:text-base"
             />
           </div>
+          </div>
 
-          {/* Actions */}
-          <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3">
+          {/* Actions - Footer fixo */}
+          <div className="px-5 md:px-8 py-4 md:py-5 bg-white border-t border-gray-100 flex-shrink-0">
+            <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3">
             {/* Delete button - only show when editing */}
             <div>
               {editingPost && (
@@ -307,6 +432,7 @@ function PostModal({ isOpen, onClose, onSave, onDelete, selectedDate, editingPos
                 {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
                 {isSaving ? 'Salvando...' : 'Salvar'}
               </button>
+            </div>
             </div>
           </div>
         </form>
