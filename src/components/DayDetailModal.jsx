@@ -1,6 +1,6 @@
 import React from 'react';
 import { X, Plus, Calendar, Image, Video, CircleDot, LayoutGrid } from 'lucide-react';
-import { getOwnersByIds } from '../config/owners';
+import { getOwnersByIds, getAccountById, getResponsibleById } from '../config/owners';
 
 const contentTypeIcons = {
   'Post (Imagem)': Image,
@@ -96,6 +96,26 @@ function DayDetailModal({ isOpen, onClose, selectedDate, posts, onPostClick, onC
                 const Icon = contentTypeIcons[post.contentType] || Image;
                 const status = statusColors[post.status] || statusColors['Planejado'];
                 
+                // Suporte para formato novo (account + responsibles) e antigo (owners)
+                const displayItems = [];
+                
+                if (post.account) {
+                  const account = getAccountById(post.account);
+                  if (account) displayItems.push(account);
+                }
+                
+                if (post.responsibles && post.responsibles.length > 0) {
+                  post.responsibles.forEach(id => {
+                    const responsible = getResponsibleById(id);
+                    if (responsible) displayItems.push(responsible);
+                  });
+                }
+                
+                // Fallback para formato antigo
+                if (displayItems.length === 0 && post.owners && post.owners.length > 0) {
+                  displayItems.push(...getOwnersByIds(post.owners));
+                }
+                
                 return (
                   <button
                     key={post.id}
@@ -125,23 +145,23 @@ function DayDetailModal({ isOpen, onClose, selectedDate, posts, onPostClick, onC
                             {post.channel}
                           </span>
                         </div>
-                        {/* Responsáveis */}
-                        {post.owners && post.owners.length > 0 && (
+                        {/* Conta e Responsáveis */}
+                        {displayItems.length > 0 && (
                           <div className="flex items-center gap-1 mt-2">
                             <div className="flex -space-x-1">
-                              {getOwnersByIds(post.owners).slice(0, 3).map((owner) => (
+                              {displayItems.slice(0, 3).map((item) => (
                                 <div
-                                  key={owner.id}
+                                  key={item.id}
                                   className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[8px] font-bold border-2 border-white"
-                                  style={{ backgroundColor: owner.color }}
-                                  title={owner.name}
+                                  style={{ backgroundColor: item.color }}
+                                  title={item.name}
                                 >
-                                  {owner.initials}
+                                  {item.initials}
                                 </div>
                               ))}
-                              {post.owners.length > 3 && (
+                              {displayItems.length > 3 && (
                                 <div className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-medium bg-gray-200 text-gray-600 border-2 border-white">
-                                  +{post.owners.length - 3}
+                                  +{displayItems.length - 3}
                                 </div>
                               )}
                             </div>

@@ -162,9 +162,14 @@ function App() {
 
   // Filtrar posts por responsável (múltiplos)
   const filteredPosts = ownerFilter.length > 0
-    ? posts.filter((post) => 
-        post.owners?.some(ownerId => ownerFilter.includes(ownerId))
-      )
+    ? posts.filter((post) => {
+        // Suporta novo formato (account + responsibles) e antigo (owners)
+        const allIds = [];
+        if (post.account) allIds.push(post.account);
+        if (post.responsibles) allIds.push(...post.responsibles);
+        if (post.owners) allIds.push(...post.owners);
+        return allIds.some(id => ownerFilter.includes(id));
+      })
     : posts;
 
   // Filtrar posts do dia selecionado (já com filtro de responsável aplicado)

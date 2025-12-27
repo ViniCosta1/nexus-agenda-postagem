@@ -1,19 +1,37 @@
-// Lista de responsáveis disponíveis para as postagens
-// Pode ser expandida ou vir de um banco de dados no futuro
-
-export const OWNERS = [
+// Lista de contas disponíveis para as postagens
+export const ACCOUNTS = [
   { id: 'grupo-nexus', name: 'Grupo Nexus', color: '#6117F4', initials: 'GN' },
-  { id: 'agencia-nexus', name: 'Agência Nexus', color: '#E91E63', initials: 'AN' },
-  { id: 'nexus-executive', name: 'Nexus Executive', color: '#FF9800', initials: 'NE' },
-  { id: 'nexus-systems', name: 'Nexus Systems', color: '#2196F3', initials: 'NS' },
+  { id: 'executive', name: 'Executive', color: '#FF9800', initials: 'EX' },
+  { id: 'systems', name: 'Systems', color: '#2196F3', initials: 'SY' },
   { id: 'lavinia', name: 'Lavínia Siviero', color: '#9C27B0', initials: 'LS' },
   { id: 'gabriel', name: 'Gabriel Angelo', color: '#4CAF50', initials: 'GA' },
-  { id: 'vinicius', name: 'Vinicius Costa', color: '#00BCD4', initials: 'VC' },
+  { id: 'vinicius', name: 'Vinícius Costa', color: '#00BCD4', initials: 'VC' },
 ];
 
+// Lista de responsáveis disponíveis para as postagens
+export const RESPONSIBLES = [
+  { id: 'pedro', name: 'Pedro Lucas', color: '#FF5722', initials: 'PL' },
+  { id: 'lavinia', name: 'Lavínia Siviero', color: '#9C27B0', initials: 'LS' },
+  { id: 'gabriel', name: 'Gabriel Angelo', color: '#4CAF50', initials: 'GA' },
+  { id: 'vinicius', name: 'Vinícius Costa', color: '#00BCD4', initials: 'VC' },
+];
+
+// Mantém compatibilidade com código existente
+export const OWNERS = [...ACCOUNTS];
+
+// Função helper para obter uma conta pelo ID
+export const getAccountById = (id) => {
+  return ACCOUNTS.find(account => account.id === id) || null;
+};
+
 // Função helper para obter um responsável pelo ID
+export const getResponsibleById = (id) => {
+  return RESPONSIBLES.find(responsible => responsible.id === id) || null;
+};
+
+// Função helper para obter um item (conta ou responsável) pelo ID
 export const getOwnerById = (id) => {
-  return OWNERS.find(owner => owner.id === id) || null;
+  return getAccountById(id) || getResponsibleById(id) || null;
 };
 
 // Função helper para obter múltiplos responsáveis pelos IDs
